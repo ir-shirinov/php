@@ -5,38 +5,10 @@ $user_name = 'Константин';
 $user_avatar = 'img/user.jpg';
 $categoryes = ["Доски и лыжи", "Крепления", "Ботинки","Одежда", "Инструменты", "Разное"];
 ;
-$advertising =[
-    [   "name" => "2014 Rossignol District Snowboard",
-        "categoryes" => $categoryes[0],
-        "price" => 10999,
-        "url" => "img/lot-1.jpg",
-    ],
-    [   "name" => "DC Ply Mens 2016/2017 Snowboard",
-        "categoryes" => $categoryes[0],
-        "price" => 159999,
-        "url" => "img/lot-2.jpg",
-    ],
-    [   "name" => "Крепления Union Contact Pro 2015 года размер L/XL",
-        "categoryes" => $categoryes[1],
-        "price" => 8000,
-        "url" => "img/lot-3.jpg",
-    ],
-    [   "name" => "Ботинки для сноуборда DC Mutiny Charocal",
-        "categoryes" => $categoryes[2],
-        "price" => 10999,
-        "url" => "img/lot-4.jpg",
-    ],
-    [   "name" => "Куртка для сноуборда DC Mutiny Charocal",
-        "categoryes" => $categoryes[3],
-        "price" => 7500,
-        "url" => "img/lot-5.jpg",
-    ],
-    [   "name" => "Маска Oakley Canopy",
-        "categoryes" => $categoryes[5],
-        "price" => 5400,
-        "url" => "img/lot-6.jpg",
-    ],
-];
+
+
+
+require 'lots_data.php';
 
 function resize_price($price) {
     $new_price = ceil($price);
@@ -59,18 +31,25 @@ $time_live = $nextDayHour.':'.$nextDayMin;
 
 require 'functions.php';
 
+$base = mysqli_connect('yeticave', 'root', '','yeticave');
+mysqli_set_charset($base, 'utf8');
+$sql = 'SELECT * FROM lots l
+JOIN categories c
+ON l.cat_id = c.id
+WHERE date_end IS NOT NULL ORDER BY date_init ASC';
+$result = mysqli_query($base, $sql);
+$rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+
 $content = createHtml('templates/index.php', [
-    'advertising' => $advertising,
+    'advertising' => $rows,
     'time_live' => $time_live,
 ]);
 
 $resultHTML = createHtml('templates/layout.php', [
     'title' => 'Главная страница',
     'categoryes' => $categoryes,
-    'user_name' => $user_name,
-    'user_avatar' => $user_avatar,
     'content' => $content,
-    'is_auth' => $is_auth,
 ]);
 
 print($resultHTML);
